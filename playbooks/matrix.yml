@@ -43,7 +43,7 @@
 
     - role: galaxy/com.devture.ansible.role.postgres
 
-    - custom/matrix-redis
+    - galaxy/redis
     - custom/matrix-corporal
     - custom/matrix-bridge-appservice-discord
     - custom/matrix-bridge-appservice-slack
@@ -79,41 +79,55 @@
     - custom/matrix-bot-postmoogle
     - custom/matrix-bot-go-neb
     - custom/matrix-bot-mjolnir
+    - custom/matrix-bot-draupnir
     - custom/matrix-bot-chatgpt
     - custom/matrix-cactus-comments
+    - custom/matrix-rageshake
     - custom/matrix-synapse
+    - custom/matrix-synapse-auto-compressor
     - custom/matrix-synapse-reverse-proxy-companion
     - custom/matrix-dendrite
     - custom/matrix-conduit
     - custom/matrix-synapse-admin
     - galaxy/prometheus_node_exporter
-    - custom/matrix-prometheus-postgres-exporter
+    - galaxy/prometheus_postgres_exporter
     - custom/matrix-prometheus-nginxlog-exporter
-    - custom/matrix-prometheus
-    - custom/matrix-grafana
+    - galaxy/prometheus
+    - galaxy/grafana
+    - custom/matrix-prometheus-services-connect
     - custom/matrix-prometheus-services-proxy-connect
     - custom/matrix-registration
     - custom/matrix-client-element
     - custom/matrix-client-hydrogen
     - custom/matrix-client-cinny
-    - custom/matrix-jitsi
+    - galaxy/jitsi
+    - custom/matrix-user-verification-service
     - custom/matrix-ldap-registration-proxy
     - custom/matrix-ma1sd
     - custom/matrix-dimension
-    - custom/matrix-etherpad
+    - galaxy/etherpad
+    - custom/etherpad-proxy-connect
+    - custom/matrix-sliding-sync
     - custom/matrix-email2matrix
     - custom/matrix-sygnal
-    - custom/matrix-ntfy
+    - galaxy/ntfy
     - custom/matrix-nginx-proxy
     - custom/matrix-coturn
-    - custom/matrix-aux
+
+    - role: galaxy/aux
 
     - role: galaxy/com.devture.ansible.role.postgres_backup
 
-    - custom/matrix-backup-borg
+    - role: galaxy/backup_borg
 
     - custom/matrix-user-creator
     - custom/matrix-common-after
+
+    - role: galaxy/com.devture.ansible.role.container_socket_proxy
+
+    - role: galaxy/com.devture.ansible.role.traefik
+
+    - role: galaxy/com.devture.ansible.role.traefik_certs_dumper
 
     - when: devture_systemd_service_manager_enabled | bool
       role: galaxy/com.devture.ansible.role.systemd_service_manager

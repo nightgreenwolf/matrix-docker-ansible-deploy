@@ -21,6 +21,10 @@ matrix_nginx_proxy_systemd_required_services_list: ['docker.service']
 # List of systemd services that matrix-nginx-proxy.service wants
 matrix_nginx_proxy_systemd_wanted_services_list: []
 
+# The base container network.
+# Also see: matrix_nginx_proxy_container_additional_networks
+matrix_nginx_proxy_container_network: "{{ matrix_docker_network }}"
+
 # A list of additional container networks that matrix-nginx-proxy would be connected to.
 # The playbook does not create these networks, so make sure they already exist.
 #
@@ -35,6 +39,39 @@ matrix_nginx_proxy_container_additional_networks: []
 # if you wish to mount your own files into the container.
 # Contains definition objects like this: `{"src": "/outside", "dst": "/inside", "options": "rw|ro|slave|.."}
 matrix_nginx_proxy_container_additional_volumes: []
+
+# matrix_nginx_proxy_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
+# See `../templates/labels.j2` for details.
+#
+# To inject your own other container labels, see `matrix_nginx_proxy_container_labels_additional_labels`.
+matrix_nginx_proxy_container_labels_traefik_enabled: false
+matrix_nginx_proxy_container_labels_traefik_docker_network: "{{ matrix_nginx_proxy_container_network }}"
+matrix_nginx_proxy_container_labels_traefik_entrypoints: web-secure
+matrix_nginx_proxy_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+
+matrix_nginx_proxy_container_labels_traefik_proxy_base_domain_enabled: "{{ matrix_nginx_proxy_base_domain_serving_enabled }}"
+matrix_nginx_proxy_container_labels_traefik_proxy_base_domain_hostname: "{{ matrix_nginx_proxy_base_domain_hostname }}"
+matrix_nginx_proxy_container_labels_traefik_proxy_base_domain_tls: "{{ matrix_nginx_proxy_container_labels_traefik_entrypoints != 'web' }}"
+matrix_nginx_proxy_container_labels_traefik_proxy_base_domain_rule: "Host(`{{ matrix_nginx_proxy_container_labels_traefik_proxy_base_domain_hostname }}`)"
+
+matrix_nginx_proxy_container_labels_traefik_proxy_matrix_enabled: false
+matrix_nginx_proxy_container_labels_traefik_proxy_matrix_tls: "{{ matrix_nginx_proxy_container_labels_traefik_entrypoints != 'web' }}"
+matrix_nginx_proxy_container_labels_traefik_proxy_matrix_client_hostname: "{{ matrix_server_fqn_matrix }}"
+matrix_nginx_proxy_container_labels_traefik_proxy_matrix_client_rule: "Host(`{{ matrix_nginx_proxy_container_labels_traefik_proxy_matrix_client_hostname }}`)"
+matrix_nginx_proxy_container_labels_traefik_proxy_matrix_federation_hostname: "{{ matrix_server_fqn_matrix }}"
+matrix_nginx_proxy_container_labels_traefik_proxy_matrix_federation_rule: "Host(`{{ matrix_nginx_proxy_container_labels_traefik_proxy_matrix_federation_hostname }}`)"
+matrix_nginx_proxy_container_labels_traefik_proxy_matrix_federation_entrypoint: "{{ matrix_federation_traefik_entrypoint }}"
+matrix_nginx_proxy_container_labels_traefik_proxy_matrix_federation_entrypoints: "{{ matrix_nginx_proxy_container_labels_traefik_proxy_matrix_federation_entrypoint }}"
+
+# matrix_nginx_proxy_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
+# See `../templates/labels.j2` for details.
+#
+# Example:
+# matrix_nginx_proxy_container_labels_additional_labels: |
+#   my.label=1
+#   another.label="here"
+matrix_nginx_proxy_container_labels_additional_labels: ''
+
 
 # A list of extra arguments to pass to the container
 matrix_nginx_proxy_container_extra_arguments: []
@@ -191,6 +228,10 @@ matrix_nginx_proxy_proxy_matrix_federation_port: 8448
 # Controls whether proxying the dimension domain should be done.
 matrix_nginx_proxy_proxy_dimension_enabled: false
 matrix_nginx_proxy_proxy_dimension_hostname: "{{ matrix_server_fqn_dimension }}"
+
+# Controls whether proxying the rageshake domain should be done.
+matrix_nginx_proxy_proxy_rageshake_enabled: false
+matrix_nginx_proxy_proxy_rageshake_hostname: "{{ matrix_server_fqn_rageshake }}"
 
 # Controls whether proxying the etherpad domain should be done.
 matrix_nginx_proxy_proxy_etherpad_enabled: false
@@ -376,6 +417,9 @@ matrix_nginx_proxy_proxy_buscarron_additional_server_configuration_blocks: []
 
 # A list of strings containing additional configuration blocks to add to Dimension's server configuration (matrix-dimension.conf).
 matrix_nginx_proxy_proxy_dimension_additional_server_configuration_blocks: []
+
+# A list of strings containing additional configuration blocks to add to Rageshake's server configuration (matrix-rageshake.conf).
+matrix_nginx_proxy_proxy_rageshake_additional_server_configuration_blocks: []
 
 # A list of strings containing additional configuration blocks to add to etherpad's server configuration (matrix-etherpad.conf).
 matrix_nginx_proxy_proxy_etherpad_additional_server_configuration_blocks: []

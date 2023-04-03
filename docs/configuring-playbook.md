@@ -59,9 +59,11 @@ When you're done with all the configuration you'd like to do, continue with [Ins
 
 - [Serving your base domain using this playbook's nginx server](configuring-playbook-base-domain-serving.md) (optional)
 
-- [Configure Nginx](configuring-playbook-nginx.md) (optional, advanced)
+- [Configure the Traefik reverse-proxy](configuring-playbook-traefik.md) (optional, advanced)
 
-- [Using your own webserver, instead of this playbook's nginx proxy](configuring-playbook-own-webserver.md) (optional, advanced)
+- (Deprecated) [Configure the Nginx reverse-proxy](configuring-playbook-nginx.md) (optional, advanced)
+
+- [Using your own webserver, instead of this playbook's default reverse-proxy](configuring-playbook-own-webserver.md) (optional, advanced)
 
 - [Adjusting TURN server configuration](configuring-playbook-turn.md) (optional, advanced)
 
@@ -98,6 +100,8 @@ When you're done with all the configuration you'd like to do, continue with [Ins
 - [Setting up Synapse Simple Antispam](configuring-playbook-synapse-simple-antispam.md) (optional, advanced)
 
 - [Setting up Matrix Corporal](configuring-playbook-matrix-corporal.md) (optional, advanced)
+
+- [Matrix User Verification Service](configuring-playbook-user-verification-service.md) (optional, advanced)
 
 
 ### Bridging other networks
@@ -177,6 +181,8 @@ When you're done with all the configuration you'd like to do, continue with [Ins
 
 - [Setting up Mjolnir](configuring-playbook-bot-mjolnir.md) - a moderation tool/bot (optional)
 
+- [Setting up Draupnir](configuring-playbook-bot-draupnir.md) - a moderation tool/bot, forked from Mjolnir and maintained by its former leader developer (optional)
+
 - [Setting up Buscarron](configuring-playbook-bot-buscarron.md) - a bot you can use to send any form (HTTP POST, HTML) to a (encrypted) Matrix room (optional)
 
 
@@ -189,8 +195,14 @@ When you're done with all the configuration you'd like to do, continue with [Ins
 
 ### Other specialized services
 
+- [Setting up synapse-auto-compressor](configuring-playbook-synapse-auto-compressor.md) for compressing the database on Synapse homeservers (optional)
+
+- [Setting up the Sliding Sync Proxy](configuring-playbook-sliding-sync-proxy.md) for clients which require Sliding Sync support (like Element X) (optional)
+
 - [Setting up the Sygnal push gateway](configuring-playbook-sygnal.md) (optional)
 
 - [Setting up the ntfy push notifications server](configuring-playbook-ntfy.md) (optional)
 
 - [Setting up a Cactus Comments server](configuring-playbook-cactus-comments.md) - a federated comment system built on Matrix (optional)
+
+- [Setting up the Rageshake bug report server](configuring-playbook-rageshake.md) (optional)

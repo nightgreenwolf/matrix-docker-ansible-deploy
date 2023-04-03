@@ -4,6 +4,12 @@
 
 matrix_synapse_enabled: true
 
+matrix_synapse_version: v1.80.0
+
+matrix_synapse_username: ''
+matrix_synapse_uid: ''
+matrix_synapse_gid: ''
+
 matrix_synapse_container_image_self_build: false
 matrix_synapse_container_image_self_build_repo: "https://github.com/matrix-org/synapse.git"
 
@@ -17,11 +23,40 @@ matrix_synapse_container_image_self_build_repo: "https://github.com/matrix-org/s
 # - `matrix_synapse_container_image_customizations_dockerfile_body_custom`
 # - `matrix_synapse_docker_image_customized`
 # - `matrix_synapse_docker_image_final`
-matrix_synapse_container_image_customizations_enabled: "{{ matrix_synapse_ext_synapse_s3_storage_provider_enabled }}"
+matrix_synapse_container_image_customizations_enabled: |-
+  {{
+    matrix_synapse_container_image_customizations_s3_storage_provider_installation_enabled
+    or
+    matrix_synapse_container_image_customizations_templates_enabled
+  }}
 
 # Controls whether custom build steps will be added to the Dockerfile for installing s3-storage-provider.
 # The version that will be installed is specified in `matrix_synapse_ext_synapse_s3_storage_provider_version`.
 matrix_synapse_container_image_customizations_s3_storage_provider_installation_enabled: "{{ matrix_synapse_ext_synapse_s3_storage_provider_enabled }}"
+
+# Controls whether custom build steps will be added to the Dockerfile for customizing the email templates used by Synapse.
+#
+# Example usage:
+#
+# ```yml
+# matrix_synapse_container_image_customizations_templates_enabled: true
+# # The templates are expected to be in a `templates/` subdirectory in
+# matrix_synapse_container_image_customizations_templates_in_container_template_files_relative_path: templates/
+# matrix_synapse_container_image_customizations_templates_git_repository_url: git@github.com:organization/repository.git
+# matrix_synapse_container_image_customizations_templates_git_repository_branch: main
+# matrix_synapse_container_image_customizations_templates_git_repository_keyscan_enabled: true
+# matrix_synapse_container_image_customizations_templates_git_repository_keyscan_hostname: github.com
+# ```
+#
+# See: https://github.com/matrix-org/synapse/blob/develop/docs/templates.md
+matrix_synapse_container_image_customizations_templates_enabled: false
+matrix_synapse_container_image_customizations_templates_in_container_base_path: /custom-templates
+matrix_synapse_container_image_customizations_templates_in_container_template_files_relative_path: ''
+matrix_synapse_container_image_customizations_templates_in_container_full_path: "{{ matrix_synapse_container_image_customizations_templates_in_container_base_path }}/{{ matrix_synapse_container_image_customizations_templates_in_container_template_files_relative_path }}"
+matrix_synapse_container_image_customizations_templates_git_repository_url: ''
+matrix_synapse_container_image_customizations_templates_git_repository_branch: main
+matrix_synapse_container_image_customizations_templates_git_repository_keyscan_enabled: false
+matrix_synapse_container_image_customizations_templates_git_repository_keyscan_hostname: ''
 
 # matrix_synapse_container_image_customizations_dockerfile_body contains your custom Dockerfile steps
 # for building your customized Synapse image based on the original (upstream) image (`matrix_synapse_docker_image`).
@@ -34,16 +69,25 @@ matrix_synapse_container_image_customizations_s3_storage_provider_installation_e
 #  RUN echo 'You do NOT need to include a FROM clause yourself.'
 matrix_synapse_container_image_customizations_dockerfile_body_custom: ''
 
-matrix_synapse_docker_image: "{{ matrix_synapse_docker_image_name_prefix }}matrixdotorg/synapse:{{ matrix_synapse_docker_image_tag }}"
-matrix_synapse_docker_image_name_prefix: "{{ 'localhost/' if matrix_synapse_container_image_self_build else matrix_container_global_registry_prefix }}"
-matrix_synapse_version: v1.76.0
+matrix_synapse_docker_image: "{{ matrix_synapse_docker_image_name_prefix }}matrix-org/synapse:{{ matrix_synapse_docker_image_tag }}"
+matrix_synapse_docker_image_name_prefix: "{{ 'localhost/' if matrix_synapse_container_image_self_build else matrix_synapse_docker_image_registry_prefix }}"
 matrix_synapse_docker_image_tag: "{{ matrix_synapse_version }}"
 matrix_synapse_docker_image_force_pull: "{{ matrix_synapse_docker_image.endswith(':latest') }}"
+matrix_synapse_docker_image_registry_prefix: ghcr.io/
 
 # matrix_synapse_docker_image_customized is the name of the locally built Synapse image
 # which adds various customizations on top of the original (upstream) Synapse image.
 # This image will be based on the upstream `matrix_synapse_docker_image` image, only if `matrix_synapse_container_image_customizations_enabled: true`.
 matrix_synapse_docker_image_customized: "localhost/matrixdotorg/synapse:{{ matrix_synapse_docker_image_tag }}-customized"
+
+# Controls whether the customized image (`matrix_synapse_docker_image_customized`) is to be force-built without layer caching enabled.
+# This is useful if you've enabled customizations (e.g. `matrix_synapse_container_image_customizations_templates_enabled`),
+# which clone some branch of some repository, and you'd like for each Ansible run to pull new revisions from that branch.
+matrix_synapse_docker_image_customized_build_nocache: false
+
+# Controls whether the customized image (`matrix_synapse_docker_image_customized`) is to be built, even if it already exists.
+# Related to: matrix_synapse_docker_image_customized_build_nocache
+matrix_synapse_docker_image_customized_force_source: "{{ matrix_synapse_docker_image_customized_build_nocache }}"
 
 # matrix_synapse_docker_image_final holds the name of the Synapse image to run depending on whether or not customizations are enabled.
 matrix_synapse_docker_image_final: "{{ matrix_synapse_docker_image_customized if matrix_synapse_container_image_customizations_enabled else matrix_synapse_docker_image }} "
@@ -68,6 +112,14 @@ matrix_synapse_container_client_api_port: 8008
 matrix_synapse_container_federation_api_tls_port: 8448
 
 matrix_synapse_container_federation_api_plain_port: 8048
+
+# The base container network. It will be auto-created by this role if it doesn't exist already.
+matrix_synapse_container_network: "{{ matrix_docker_network }}"
+
+# A list of additional container networks that the container would be connected to.
+# The role does not create these networks, so make sure they already exist.
+# Use this to expose this container to another reverse proxy, which runs in a different container network.
+matrix_synapse_container_additional_networks: []
 
 # Controls whether the matrix-synapse container exposes the Client/Server API port (tcp/{{ matrix_synapse_container_client_api_port }} in the container).
 #
@@ -218,6 +270,13 @@ matrix_synapse_rc_federation:
 
 matrix_synapse_federation_rr_transactions_per_room_per_second: 50
 
+# Controls the templates directory setting.
+#
+# See:
+# - `matrix_synapse_container_image_customizations_templates_enabled`
+# - https://github.com/matrix-org/synapse/blob/develop/docs/templates.md
+matrix_synapse_templates_custom_template_directory: "{{ matrix_synapse_container_image_customizations_templates_in_container_full_path if matrix_synapse_container_image_customizations_templates_enabled else '' }}"
+
 # Controls whether the TLS federation listener is enabled (tcp/8448).
 # Only makes sense if federation is enabled (`matrix_synapse_federation_enabled`).
 # Note that federation may potentially be enabled as non-TLS on `matrix_synapse_container_federation_api_plain_port` as well.
@@ -311,6 +370,11 @@ matrix_synapse_auto_join_rooms: []
 # Controls whether auto-join rooms (`matrix_synapse_auto_join_rooms`) are to be created
 # automatically if they don't already exist.
 matrix_synapse_autocreate_auto_join_rooms: true
+
+# Controls whether password authentication is allowed
+# It may be useful when you've configured OAuth, SAML or CAS and want authentication
+# to happen only through them
+matrix_synapse_password_config_enabled: true
 
 # Controls password-peppering for Synapse. Not to be changed after initial setup.
 matrix_synapse_password_config_pepper: ""
@@ -661,7 +725,7 @@ matrix_synapse_redis_password: ""
 #
 # If Redis is available, we prefer to use that, instead of talking over Synapse's custom replication protocol.
 #
-# matrix_synapse_replication_listener_enabled: "{{ matrix_synapse_workers_enabled and not matrix_redis_enabled }}"
+# matrix_synapse_replication_listener_enabled: "{{ matrix_synapse_workers_enabled and not redis_enabled }}"
 # We force-enable this listener for now until we debug why communication via Redis fails.
 matrix_synapse_replication_listener_enabled: true
 
@@ -694,6 +758,7 @@ matrix_synapse_email_smtp_user: ""
 matrix_synapse_email_smtp_pass: ""
 matrix_synapse_email_smtp_require_transport_security: false
 matrix_synapse_email_notif_from: "Matrix <matrix@{{ matrix_domain }}>"
+matrix_synapse_email_app_name: Matrix
 matrix_synapse_email_client_base_url: "https://{{ matrix_server_fqn_element }}"
 matrix_synapse_email_invite_client_location: "https://app.element.io"
 
@@ -816,6 +881,9 @@ matrix_synapse_ext_synapse_s3_storage_provider_config_threadpool_size: 40
 # It specifies how old files need to have been inactive to be eligible for migration from the local filesystem to the S3 data store.
 # By default, we use `0` which says "all files are eligible for migration".
 matrix_synapse_ext_synapse_s3_storage_provider_update_db_day_count: 0
+# Specifies how often periodic migration (`matrix-synapse-s3-storage-provider-migrate.timer`) will run.
+# This is a systemd timer OnCalendar definition. Learn more here: https://man.archlinux.org/man/systemd.time.7#CALENDAR_EVENTS
+matrix_synapse_ext_synapse_s3_storage_provider_periodic_migration_schedule: '*-*-* 05:00:00'
 
 matrix_s3_media_store_enabled: false
 matrix_s3_media_store_custom_endpoint_enabled: false
