@@ -79,7 +79,7 @@ Extend and modify how users are authenticated on your homeserver.
 | ---- | -------- | ----------- | ------------- |
 | [matrix-synapse-rest-auth](https://github.com/ma1uta/matrix-synapse-rest-password-provider) (advanced) | x | REST authentication password provider module | [Link](docs/configuring-playbook-rest-auth.md) |
 |[matrix-synapse-shared-secret-auth](https://github.com/devture/matrix-synapse-shared-secret-auth) (advanced) | x | Password provider module | [Link](docs/configuring-playbook-shared-secret-auth.md) |
-| [matrix-synapse-ldap3](https://github.com/matrix-org/matrix-synapse-ldap3) (advanced) | x | LDAP Auth password provider module | [Link](configuring-playbook-ldap-auth.md) |
+| [matrix-synapse-ldap3](https://github.com/matrix-org/matrix-synapse-ldap3) (advanced) | x | LDAP Auth password provider module | [Link](docs/configuring-playbook-ldap-auth.md) |
 | [matrix-ldap-registration-proxy](https://gitlab.com/activism.international/matrix_ldap_registration_proxy) (advanced) | x | A proxy that handles Matrix registration requests and forwards them to LDAP. | [Link](docs/configuring-playbook-matrix-ldap-registration-proxy.md) |
 | [matrix-registration](https://github.com/ZerataX/matrix-registration) | x | A simple python application to have a token based matrix registration | [Link](docs/configuring-playbook-matrix-registration.md) |
 
@@ -92,6 +92,7 @@ Use alternative file storage to the default `media_store` folder.
 | ---- | -------- | ----------- | ------------- |
 | [Goofys](https://github.com/kahing/goofys) | x | [Amazon S3](https://aws.amazon.com/s3/) (or other S3-compatible object store) storage for Synapse's content repository (`media_store`) files | [Link](docs/configuring-playbook-s3-goofys.md) |
 | [synapse-s3-storage-provider](https://github.com/matrix-org/synapse-s3-storage-provider) | x | [Amazon S3](https://aws.amazon.com/s3/) (or other S3-compatible object store) storage for Synapse's content repository (`media_store`) files | [Link](docs/configuring-playbook-s3.md) |
+| [matrix-media-repo](https://github.com/turt2live/matrix-media-repo) | x | matrix-media-repo is a highly customizable multi-domain media repository for Matrix. Intended for medium to large deployments, this media repo de-duplicates media while being fully compliant with the specification. | [Link](docs/configuring-playbook-media-repo.md) |
 
 ### Bridges
 
@@ -102,6 +103,7 @@ Bridges can be used to connect your matrix installation with third-party communi
 | [mautrix-discord](https://github.com/mautrix/discord) | x | Bridge for bridging your Matrix server to [Discord](https://discord.com/) | [Link](docs/configuring-playbook-bridge-mautrix-discord.md) |
 | [mautrix-slack](https://github.com/mautrix/slack) | x | Bridge for bridging your Matrix server to [Slack](https://slack.com/) | [Link](docs/configuring-playbook-bridge-mautrix-slack.md) |
 | [mautrix-telegram](https://github.com/mautrix/telegram) | x | Bridge for bridging your Matrix server to [Telegram](https://telegram.org/) | [Link](docs/configuring-playbook-bridge-mautrix-telegram.md) |
+| [mautrix-gmessages](https://github.com/mautrix/gmessages) | x | Bridge for bridging your Matrix server to [Google Messages](https://messages.google.com/) | [Link](docs/configuring-playbook-bridge-mautrix-gmessages.md) |
 | [mautrix-whatsapp](https://github.com/mautrix/whatsapp) | x | Bridge for bridging your Matrix server to [WhatsApp](https://www.whatsapp.com/) | [Link](docs/configuring-playbook-bridge-mautrix-whatsapp.md) |
 | [mautrix-facebook](https://github.com/mautrix/facebook) | x | Bridge for bridging your Matrix server to [Facebook](https://facebook.com/) | [Link](docs/configuring-playbook-bridge-mautrix-facebook.md) |
 | [mautrix-twitter](https://github.com/mautrix/twitter) | x | Bridge for bridging your Matrix server to [Twitter](https://twitter.com/) | [Link](docs/configuring-playbook-bridge-mautrix-twitter.md) |

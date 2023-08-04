@@ -5,6 +5,9 @@ matrix_synapse_federation_api_url_endpoint_public: "https://{{ matrix_server_fqn
 
 matrix_synapse_media_store_directory_name: "{{ matrix_synapse_media_store_path | basename }}"
 
+# Optionally: `false` to fully disable tls on outbound smtp
+matrix_synapse_email_smtp_enable_tls: true
+
 # A Synapse generic worker can handle both federation and client-server API endpoints.
 # We wish to split these, as we normally serve federation separately and don't want them mixed up.
 #
@@ -153,7 +156,6 @@ matrix_synapse_workers_generic_worker_endpoints:
   - ^/_matrix/client/v1/rooms/.*/hierarchy$
   - ^/_matrix/client/(v1|unstable)/rooms/.*/relations/
   - ^/_matrix/client/v1/rooms/.*/threads$
-  - ^/_matrix/client/unstable/org.matrix.msc2716/rooms/.*/batch_send$
   - ^/_matrix/client/unstable/im.nheko.summary/rooms/.*/summary$
   - ^/_matrix/client/(r0|v3|unstable)/account/3pid$
   - ^/_matrix/client/(r0|v3|unstable)/account/whoami$
@@ -166,6 +168,8 @@ matrix_synapse_workers_generic_worker_endpoints:
   - ^/_matrix/client/(api/v1|r0|v3|unstable/.*)/rooms/.*/aliases
   - ^/_matrix/client/(api/v1|r0|v3|unstable)/search$
   - ^/_matrix/client/(r0|v3|unstable)/user/.*/filter(/|$)
+  - ^/_matrix/client/(api/v1|r0|v3|unstable)/directory/room/.*$
+  - ^/_matrix/client/(r0|v3|unstable)/capabilities$
 
   # Encryption requests
   # Note that ^/_matrix/client/(r0|v3|unstable)/keys/upload/ requires `worker_main_http_uri`

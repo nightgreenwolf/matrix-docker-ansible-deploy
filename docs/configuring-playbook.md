@@ -12,7 +12,7 @@ You can then follow these steps inside the playbook directory:
 
 1. copy the sample configuration file (`cp examples/vars.yml inventory/host_vars/matrix.<your-domain>/vars.yml`)
 
-1. edit the configuration file (`inventory/host_vars/matrix.<your-domain>/vars.yml`) to your liking. You may also take a look at the various `roles/ROLE_NAME_HERE/defaults/main.yml` files and see if there's something you'd like to copy over and override in your `vars.yml` configuration file.
+1. edit the configuration file (`inventory/host_vars/matrix.<your-domain>/vars.yml`) to your liking. You may also take a look at the various `roles/*/ROLE_NAME_HERE/defaults/main.yml` files and see if there's something you'd like to copy over and override in your `vars.yml` configuration file.
 
 1. copy the sample inventory hosts file (`cp examples/hosts inventory/hosts`)
 
@@ -50,6 +50,8 @@ When you're done with all the configuration you'd like to do, continue with [Ins
   - [Configuring Dendrite](configuring-playbook-dendrite.md), if you've switched to the [Dendrite](https://matrix-org.github.io/dendrite) homeserver implementation (optional)
 
 - [Configuring Element](configuring-playbook-client-element.md) (optional)
+
+- [Storing Matrix media files using matrix-media-repo](configuring-playbook-matrix-media-repo.md) (optional)
 
 - [Storing Matrix media files on Amazon S3](configuring-playbook-s3.md) (optional)
 
@@ -111,6 +113,8 @@ When you're done with all the configuration you'd like to do, continue with [Ins
 - [Setting up Mautrix Telegram bridging](configuring-playbook-bridge-mautrix-telegram.md) (optional)
 
 - [Setting up Mautrix Slack bridging](configuring-playbook-bridge-mautrix-slack.md) (optional)
+
+- [Setting up Mautrix Google Messages bridging](configuring-playbook-bridge-mautrix-gmessages.md) (optional)
 
 - [Setting up Mautrix Whatsapp bridging](configuring-playbook-bridge-mautrix-whatsapp.md) (optional)
 

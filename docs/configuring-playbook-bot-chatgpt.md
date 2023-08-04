@@ -20,9 +20,11 @@ ansible-playbook -i inventory/hosts setup.yml --extra-vars='username=bot.chatgpt
 ```
 
 
-## 2. Get an access token
+## 2. Get an access token and create encryption keys
 
 Refer to the documentation on [how to obtain an access token](obtaining-access-tokens.md).
+
+To make sure the bot can read encrypted messages, it will need an encryption key, just like any other new user. While obtaining the access token, follow the prompts to setup a backup key. More information can be found in the [element documentation](https://element.io/help#encryption6).
 
 
 ## 3. Adjusting the playbook configuration
@@ -41,6 +43,11 @@ matrix_bot_chatgpt_openai_api_key: ''
 # Matrix access token (from bot user above)
 # see: https://webapps.stackexchange.com/questions/131056/how-to-get-an-access-token-for-element-riot-matrix
 matrix_bot_chatgpt_matrix_access_token: ''
+
+# Configuring the system promt used, needed if the bot is used for special tasks.
+# More information: https://github.com/mustvlad/ChatGPT-System-Prompts
+matrix_bot_chatgpt_matrix_bot_prompt_prefix: 'Instructions:\nYou are ChatGPT, a large language model trained by OpenAI.'
+
 ```
 
 You will need to get tokens for ChatGPT.
