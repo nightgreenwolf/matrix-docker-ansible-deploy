@@ -72,6 +72,9 @@ matrix_server_fqn_hydrogen: "hydrogen.{{ matrix_domain }}"
 # This is where you access the Cinny web client from (if enabled via matrix_client_cinny_enabled; disabled by default).
 matrix_server_fqn_cinny: "cinny.{{ matrix_domain }}"
 
+# This is where you access the schildichat web client from (if enabled via matrix_client_schildichat_enabled; disabled by default).
+matrix_server_fqn_schildichat: "schildichat.{{ matrix_domain }}"
+
 # This is where you access the buscarron bot from (if enabled via matrix_bot_buscarron_enabled; disabled by default).
 matrix_server_fqn_buscarron: "buscarron.{{ matrix_domain }}"
 
@@ -92,6 +95,9 @@ matrix_server_fqn_grafana: "stats.{{ matrix_domain }}"
 
 # This is where you access the Sygnal push gateway.
 matrix_server_fqn_sygnal: "sygnal.{{ matrix_domain }}"
+
+# This is where you access the mautrix wsproxy push gateway.
+matrix_server_fqn_mautrix_wsproxy: "wsproxy.{{ matrix_domain }}"
 
 # This is where you access the ntfy push notification service.
 matrix_server_fqn_ntfy: "ntfy.{{ matrix_domain }}"
@@ -150,6 +156,12 @@ matrix_homeserver_container_url: ""
 # This likely gets overriden elsewhere.
 matrix_homeserver_container_federation_url: ""
 
+# Specifies the public url of the Sync v3 (sliding-sync) API.
+# This will be used to set the `org.matrix.msc3575.proxy` property in `/.well-known/matrix/client`.
+# Once the API is stabilized, this will no longer be required.
+# See MSC3575: https://github.com/matrix-org/matrix-spec-proposals/blob/kegan/sync-v3/proposals/3575-sync.md
+matrix_homeserver_sliding_sync_url: ""
+
 matrix_identity_server_url: ~
 
 matrix_integration_manager_rest_url: ~
@@ -158,7 +170,7 @@ matrix_integration_manager_ui_url: ~
 # The domain name where a Jitsi server is self-hosted.
 # If set, `/.well-known/matrix/client` will suggest Element clients to use that Jitsi server.
 # See: https://github.com/vector-im/element-web/blob/develop/docs/jitsi.md#configuring-element-to-use-your-self-hosted-jitsi-server
-matrix_client_element_jitsi_preferredDomain: ''  # noqa var-naming
+matrix_client_element_jitsi_preferred_domain: ''  # noqa var-naming
 
 # Controls whether Element should use End-to-End Encryption by default.
 # Setting this to false will update `/.well-known/matrix/client` and tell Element clients to avoid E2EE.

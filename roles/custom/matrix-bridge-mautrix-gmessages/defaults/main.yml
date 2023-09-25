@@ -6,9 +6,9 @@ matrix_mautrix_gmessages_enabled: true
 
 matrix_mautrix_gmessages_container_image_self_build: false
 matrix_mautrix_gmessages_container_image_self_build_repo: "https://github.com/mautrix/gmessages.git"
-matrix_mautrix_gmessages_container_image_self_build_branch: "{{ 'master' if matrix_mautrix_gmessages_version == 'latest' else matrix_mautrix_gmessages_version }}"
+matrix_mautrix_gmessages_container_image_self_build_branch: "{{ 'main' if matrix_mautrix_gmessages_version == 'latest' else matrix_mautrix_gmessages_version }}"
 
-matrix_mautrix_gmessages_version: latest
+matrix_mautrix_gmessages_version: v0.2.0
 # See: https://mau.dev/mautrix/gmessages/container_registry
 matrix_mautrix_gmessages_docker_image: "{{ matrix_mautrix_gmessages_docker_image_name_prefix }}mautrix/gmessages:{{ matrix_mautrix_gmessages_version }}"
 matrix_mautrix_gmessages_docker_image_name_prefix: "{{ 'localhost/' if matrix_mautrix_gmessages_container_image_self_build else 'dock.mau.dev/' }}"
@@ -74,8 +74,9 @@ matrix_mautrix_gmessages_database_password: 'some-password'
 matrix_mautrix_gmessages_database_hostname: ''
 matrix_mautrix_gmessages_database_port: 5432
 matrix_mautrix_gmessages_database_name: 'matrix_mautrix_gmessages'
+matrix_mautrix_gmessages_database_sslmode: disable
 
-matrix_mautrix_gmessages_database_connection_string: 'postgresql://{{ matrix_mautrix_gmessages_database_username }}:{{ matrix_mautrix_gmessages_database_password }}@{{ matrix_mautrix_gmessages_database_hostname }}:{{ matrix_mautrix_gmessages_database_port }}/{{ matrix_mautrix_gmessages_database_name }}?sslmode=disable'
+matrix_mautrix_gmessages_database_connection_string: 'postgresql://{{ matrix_mautrix_gmessages_database_username }}:{{ matrix_mautrix_gmessages_database_password }}@{{ matrix_mautrix_gmessages_database_hostname }}:{{ matrix_mautrix_gmessages_database_port }}/{{ matrix_mautrix_gmessages_database_name }}?sslmode={{ matrix_mautrix_gmessages_database_sslmode }}'
 
 matrix_mautrix_gmessages_appservice_database_type: "{{
 	{

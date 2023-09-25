@@ -1,3 +1,21 @@
+# 2023-08-31
+
+## SchildiChat support
+
+Thanks to [Aine](https://gitlab.com/etke.cc) of [etke.cc](https://etke.cc/), the playbook can now set up the [SchildiChat](https://github.com/SchildiChat/schildichat-desktop) client.
+
+See our [Configuring SchildiChat](docs/configuring-playbook-client-schildichat.md) documentation to get started.
+
+
+# 2023-08-23
+
+## mautrix-wsproxy support
+
+Thanks to [Johan Swetzén](https://github.com/jswetzen)'s efforts (who finished what was started by [James Reilly](https://github.com/hanthor) and [Shreyas Ajjarapu](https://github.com/shreyasajj)), the playbook now supports bridging to Android SMS and Apple iMessage via the [mautrix-wsproxy](https://github.com/mautrix/wsproxy) service (in combination with a [mautrix-imessage](https://github.com/mautrix/imessage) bridge running on your Mac or Android phone).
+
+See our [Setting up Mautrix wsproxy for bridging Android SMS or Apple iMessage](docs/configuring-playbook-bridge-mautrix-wsproxy.md) documentation page for getting started.
+
+
 # 2023-07-24
 
 ## matrix-registration-bot usage changed
@@ -9,11 +27,13 @@
 * `matrix_bot_matrix_registration_bot_bot_access_token`
 * `matrix_bot_matrix_registration_bot_api_token`
 
+
 # 2023-07-21
 
 ## mautrix-gmessages support
 
 Thanks to [Shreyas Ajjarapu](https://github.com/shreyasajj)'s efforts, the playbook now supports bridging to [Google Messages](https://messages.google.com/) via the [mautrix-gmessages](https://github.com/mautrix/gmessages) bridge. See our [Setting up Mautrix Google Messages bridging](docs/configuring-playbook-bridge-mautrix-gmessages.md) documentation page for getting started.
+
 
 # 2023-07-17
 
@@ -385,7 +405,7 @@ Additional details are available in the [Authenticate using Matrix OpenID (Auth-
 
 ## Draupnir moderation tool (bot) support
 
-Thanks to [FSG-Cat](https://github.com/FSG-Cat), the playbook can now install and configure the [Draupnir](https://github.com/Gnuxie/Draupnir) moderation tool (bot). Draupnir is a fork of [Mjolnir](docs/configuring-playbook-bot-mjolnir.md) (which the playbook has supported for a long time) maintained by Mjolnir's former lead developer.
+Thanks to [FSG-Cat](https://github.com/FSG-Cat), the playbook can now install and configure the [Draupnir](https://github.com/the-draupnir-project/Draupnir) moderation tool (bot). Draupnir is a fork of [Mjolnir](docs/configuring-playbook-bot-mjolnir.md) (which the playbook has supported for a long time) maintained by Mjolnir's former lead developer.
 
 Additional details are available in [Setting up Draupnir](docs/configuring-playbook-bot-draupnir.md).
 

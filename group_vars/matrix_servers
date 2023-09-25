@@ -105,6 +105,10 @@ matrix_homeserver_container_extra_arguments_auto: |
     +
     (['--mount type=bind,src=' + matrix_mautrix_whatsapp_config_path + '/registration.yaml,dst=/matrix-mautrix-whatsapp-registration.yaml,ro'] if matrix_mautrix_whatsapp_enabled else [])
     +
+    (['--mount type=bind,src=' + matrix_mautrix_wsproxy_config_path + '/androidsms-registration.yaml,dst=/matrix-mautrix-androidsms-registration.yaml,ro'] if matrix_mautrix_wsproxy_enabled else [])
+    +
+    (['--mount type=bind,src=' + matrix_mautrix_wsproxy_config_path + '/imessage-registration.yaml,dst=/matrix-mautrix-imessage-registration.yaml,ro'] if matrix_mautrix_wsproxy_enabled else [])
+    +
     (['--mount type=bind,src=' + matrix_mx_puppet_discord_config_path + '/registration.yaml,dst=/matrix-mx-puppet-discord-registration.yaml,ro'] if matrix_mx_puppet_discord_enabled else [])
     +
     (['--mount type=bind,src=' + matrix_mx_puppet_groupme_config_path + '/registration.yaml,dst=/matrix-mx-puppet-groupme-registration.yaml,ro'] if matrix_mx_puppet_groupme_enabled else [])
@@ -163,6 +167,10 @@ matrix_homeserver_app_service_config_files_auto: |
     (['/matrix-mautrix-gmessages-registration.yaml'] if matrix_mautrix_gmessages_enabled else [])
     +
     (['/matrix-mautrix-whatsapp-registration.yaml'] if matrix_mautrix_whatsapp_enabled else [])
+    +
+    (['/matrix-mautrix-androidsms-registration.yaml'] if matrix_mautrix_wsproxy_enabled else [])
+    +
+    (['/matrix-mautrix-imessage-registration.yaml'] if matrix_mautrix_wsproxy_enabled else [])
     +
     (['/matrix-mx-puppet-discord-registration.yaml'] if matrix_mx_puppet_discord_enabled else [])
     +
@@ -278,6 +286,10 @@ devture_systemd_service_manager_services_list_auto: |
     +
     ([{'name': 'matrix-mautrix-whatsapp.service', 'priority': 2000, 'groups': ['matrix', 'bridges', 'mautrix-whatsapp']}] if matrix_mautrix_whatsapp_enabled else [])
     +
+    ([{'name': 'matrix-mautrix-wsproxy.service', 'priority': 2000, 'groups': ['matrix', 'bridges', 'mautrix-wsproxy']}] if matrix_mautrix_wsproxy_enabled else [])
+    +
+    ([{'name': 'matrix-mautrix-wsproxy-syncproxy.service', 'priority': 2000, 'groups': ['matrix', 'bridges', 'mautrix-wsproxy-syncproxy']}] if matrix_mautrix_wsproxy_enabled else [])
+    +
     ([{'name': 'matrix-mx-puppet-discord.service', 'priority': 2000, 'groups': ['matrix', 'bridges', 'mx-puppet-discord']}] if matrix_mx_puppet_discord_enabled else [])
     +
     ([{'name': 'matrix-mx-puppet-groupme.service', 'priority': 2000, 'groups': ['matrix', 'bridges', 'mx-puppet-groupme']}] if matrix_mx_puppet_groupme_enabled else [])
@@ -299,6 +311,8 @@ devture_systemd_service_manager_services_list_auto: |
     ([{'name': 'matrix-client-element.service', 'priority': 2000, 'groups': ['matrix', 'clients', 'element', 'client-element']}] if matrix_client_element_enabled else [])
     +
     ([{'name': 'matrix-client-hydrogen.service', 'priority': 2000, 'groups': ['matrix', 'clients', 'hydrogen', 'client-hydrogen']}] if matrix_client_hydrogen_enabled else [])
+    +
+    ([{'name': 'matrix-client-schildichat.service', 'priority': 2000, 'groups': ['matrix', 'clients', 'schildichat', 'client-schildichat']}] if matrix_client_schildichat_enabled else [])
     +
     ([{'name': ('matrix-' + matrix_homeserver_implementation + '.service'), 'priority': 1000, 'groups': ['matrix', 'homeservers', matrix_homeserver_implementation]}] if matrix_homeserver_enabled else [])
     +
@@ -1206,6 +1220,53 @@ matrix_mautrix_gmessages_database_password: "{{ '%s' | format(matrix_homeserver_
 
 ######################################################################
 #
+# matrix-bridge-mautrix-wsproxy
+#
+######################################################################
+
+# We don't enable bridges by default.
+matrix_mautrix_wsproxy_enabled: false
+
+matrix_mautrix_wsproxy_systemd_required_services_list: |
+  {{
+    ['docker.service']
+    +
+    ['matrix-' + matrix_homeserver_implementation + '.service']
+    +
+    ([devture_postgres_identifier ~ '.service'] if devture_postgres_enabled else [])
+    +
+    (['matrix-nginx-proxy.service'] if matrix_nginx_proxy_enabled else [])
+  }}
+
+matrix_mautrix_wsproxy_homeserver_domain: "{{ matrix_domain }}"
+
+matrix_mautrix_wsproxy_homeserver_address: "{{ matrix_homeserver_container_url }}"
+matrix_mautrix_wsproxy_hostname: "wsproxy.{{ matrix_mautrix_wsproxy_homeserver_domain }}"
+
+matrix_mautrix_wsproxy_container_additional_networks: |
+  {{
+    (
+      ([matrix_playbook_reverse_proxyable_services_additional_network] if matrix_playbook_reverse_proxyable_services_additional_network else [])
+      +
+      ([matrix_nginx_proxy_container_network] if matrix_nginx_proxy_enabled and matrix_nginx_proxy_container_network != matrix_mautrix_wsproxy_container_network else [])
+      +
+      ([devture_postgres_container_network] if devture_postgres_enabled and devture_postgres_container_network != matrix_mautrix_wsproxy_container_network else [])
+    ) | unique
+  }}
+
+matrix_mautrix_wsproxy_container_labels_traefik_enabled: "{{ matrix_playbook_reverse_proxy_type in ['playbook-managed-traefik', 'other-traefik-container'] }}"
+matrix_mautrix_wsproxy_container_labels_traefik_docker_network: "{{ matrix_playbook_reverse_proxyable_services_additional_network }}"
+matrix_mautrix_wsproxy_container_labels_traefik_entrypoints: "{{ devture_traefik_entrypoint_primary }}"
+matrix_mautrix_wsproxy_container_labels_traefik_tls_certResolver: "{{ devture_traefik_certResolver_primary }}"
+
+######################################################################
+#
+# /matrix-bridge-mautrix-wsproxy
+#
+######################################################################
+
+######################################################################
+#
 # matrix-bridge-mautrix-whatsapp
 #
 ######################################################################
@@ -2000,7 +2061,7 @@ matrix_bot_mjolnir_systemd_required_services_list: |
 # We don't enable bots by default.
 matrix_bot_draupnir_enabled: false
 
-matrix_bot_draupnir_container_image_self_build: "{{ matrix_architecture != 'amd64' }}"
+matrix_bot_draupnir_container_image_self_build: "{{ matrix_architecture not in ['amd64', 'arm64'] }}"
 
 matrix_bot_draupnir_systemd_required_services_list: |
   {{
@@ -2693,11 +2754,13 @@ matrix_nginx_proxy_proxy_matrix_enabled: true
 matrix_nginx_proxy_proxy_element_enabled: "{{ matrix_client_element_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 matrix_nginx_proxy_proxy_hydrogen_enabled: "{{ matrix_client_hydrogen_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 matrix_nginx_proxy_proxy_cinny_enabled: "{{ matrix_client_cinny_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
+matrix_nginx_proxy_proxy_schildichat_enabled: "{{ matrix_client_schildichat_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 matrix_nginx_proxy_proxy_buscarron_enabled: "{{ matrix_bot_buscarron_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 matrix_nginx_proxy_proxy_dimension_enabled: "{{ matrix_dimension_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 matrix_nginx_proxy_proxy_rageshake_enabled: "{{ matrix_rageshake_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 matrix_nginx_proxy_proxy_etherpad_enabled: "{{ etherpad_enabled and not etherpad_nginx_proxy_dimension_integration_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 matrix_nginx_proxy_proxy_bot_go_neb_enabled: "{{ matrix_bot_go_neb_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
+matrix_nginx_proxy_proxy_mautrix_wsproxy_enabled: "{{ matrix_mautrix_wsproxy_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 
 matrix_nginx_proxy_proxy_jitsi_enabled: "{{ jitsi_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] }}"
 
@@ -2792,6 +2855,8 @@ matrix_nginx_proxy_systemd_wanted_services_list: |
     +
     (['matrix-client-hydrogen.service'] if matrix_client_hydrogen_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] else [])
     +
+    (['matrix-client-schildichat.service'] if matrix_client_schildichat_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] else [])
+    +
     ([(grafana_identifier + '.service')] if grafana_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] else [])
     +
     (['matrix-dimension.service'] if matrix_dimension_enabled and matrix_playbook_reverse_proxy_type in ['playbook-managed-nginx', 'other-nginx-non-container'] else [])
@@ -2823,6 +2888,8 @@ matrix_ssl_domains_to_obtain_certificates_for: |
     +
     ([matrix_server_fqn_cinny] if matrix_client_cinny_enabled else [])
     +
+    ([matrix_server_fqn_schildichat] if matrix_client_schildichat_enabled else [])
+    +
     ([matrix_server_fqn_buscarron] if matrix_bot_buscarron_enabled else [])
     +
     ([matrix_server_fqn_dimension] if matrix_dimension_enabled else [])
@@ -2836,6 +2903,8 @@ matrix_ssl_domains_to_obtain_certificates_for: |
     ([matrix_server_fqn_grafana] if grafana_enabled else [])
     +
     ([matrix_server_fqn_sygnal] if matrix_sygnal_enabled else [])
+    +
+    ([matrix_server_fqn_mautrix_wsproxy] if matrix_mautrix_wsproxy_enabled else [])
     +
     ([ntfy_hostname] if ntfy_enabled else [])
     +
@@ -2890,10 +2959,7 @@ devture_postgres_gid: "{{ matrix_user_gid }}"
 devture_postgres_connection_username: matrix
 devture_postgres_db_name: matrix
 
-devture_postgres_systemd_services_to_stop_for_maintenance_list: |
-  {{
-    ['matrix-' + matrix_homeserver_implementation + '.service']
-  }}
+devture_postgres_systemd_services_to_stop_for_maintenance_list_auto: "{{ devture_systemd_service_manager_services_list_auto | map(attribute='name') | reject('equalto', (devture_postgres_identifier + '.service')) }}"
 
 devture_postgres_managed_databases_auto: |
   {{
@@ -3054,6 +3120,12 @@ devture_postgres_managed_databases_auto: |
       'username': matrix_mautrix_signal_database_username,
       'password': matrix_mautrix_signal_database_password,
     }] if (matrix_mautrix_signal_enabled and matrix_mautrix_signal_database_engine == 'postgres' and matrix_mautrix_signal_database_hostname == devture_postgres_connection_hostname) else [])
+    +
+    ([{
+      'name': matrix_mautrix_wsproxy_syncproxy_database_name,
+      'username': matrix_mautrix_wsproxy_syncproxy_database_username,
+      'password': matrix_mautrix_wsproxy_syncproxy_database_password,
+    }] if (matrix_mautrix_wsproxy_enabled and matrix_mautrix_wsproxy_syncproxy_database_engine == 'postgres' and matrix_mautrix_wsproxy_syncproxy_database_hostname == 'matrix-postgres') else [])
     +
     ([{
       'name': matrix_mautrix_telegram_database_name,
@@ -3341,7 +3413,7 @@ matrix_client_element_enable_presence_by_hs_url: |
 
 matrix_client_element_welcome_user_id: ~
 
-matrix_client_element_jitsi_preferredDomain: "{{ matrix_server_fqn_jitsi if jitsi_enabled else '' }}"
+matrix_client_element_jitsi_preferred_domain: "{{ matrix_server_fqn_jitsi if jitsi_enabled else '' }}"
 
 ######################################################################
 #
@@ -3414,6 +3486,60 @@ matrix_client_cinny_self_check_validate_certificates: "{{ false if matrix_playbo
 ######################################################################
 #
 # /matrix-client-cinny
+#
+######################################################################
+
+######################################################################
+#
+# matrix-client-schildichat
+#
+######################################################################
+
+matrix_client_schildichat_enabled: false
+
+matrix_client_schildichat_container_image_self_build: "{{ matrix_architecture not in ['arm64', 'amd64'] }}"
+
+# Normally, matrix-nginx-proxy is enabled and nginx can reach schildichat over the container network.
+# If matrix-nginx-proxy is not enabled, or you otherwise have a need for it, you can expose
+# the schildichat HTTP port to the local host.
+matrix_client_schildichat_container_http_host_bind_port: "{{ (matrix_playbook_service_host_bind_interface_prefix ~ '8765') if matrix_playbook_service_host_bind_interface_prefix else '' }}"
+
+matrix_client_schildichat_container_network: "{{ matrix_nginx_proxy_container_network if matrix_playbook_reverse_proxy_type == 'playbook-managed-nginx' else 'matrix-client-schildichat' }}"
+
+matrix_client_schildichat_container_additional_networks: "{{ [matrix_playbook_reverse_proxyable_services_additional_network] if matrix_playbook_reverse_proxyable_services_additional_network else [] }}"
+
+matrix_client_schildichat_container_labels_traefik_enabled: "{{ matrix_playbook_reverse_proxy_type in ['playbook-managed-traefik', 'other-traefik-container'] }}"
+matrix_client_schildichat_container_labels_traefik_docker_network: "{{ matrix_playbook_reverse_proxyable_services_additional_network }}"
+matrix_client_schildichat_container_labels_traefik_entrypoints: "{{ devture_traefik_entrypoint_primary }}"
+matrix_client_schildichat_container_labels_traefik_tls_certResolver: "{{ devture_traefik_certResolver_primary }}"
+
+matrix_client_schildichat_default_hs_url: "{{ matrix_homeserver_url }}"
+matrix_client_schildichat_default_is_url: "{{ matrix_identity_server_url }}"
+
+# Use Dimension if enabled, otherwise fall back to Scalar
+matrix_client_schildichat_integrations_ui_url: "{{ matrix_dimension_integrations_ui_url if matrix_dimension_enabled else 'https://scalar.vector.im/' }}"
+matrix_client_schildichat_integrations_rest_url: "{{ matrix_dimension_integrations_rest_url if matrix_dimension_enabled else 'https://scalar.vector.im/api' }}"
+matrix_client_schildichat_integrations_widgets_urls: "{{ matrix_dimension_integrations_widgets_urls if matrix_dimension_enabled else ['https://scalar.vector.im/api'] }}"
+matrix_client_schildichat_integrations_jitsi_widget_url: "{{ matrix_dimension_integrations_jitsi_widget_url if matrix_dimension_enabled else 'https://scalar.vector.im/api/widgets/jitsi.html' }}"
+
+matrix_client_schildichat_self_check_validate_certificates: "{{ false if matrix_playbook_ssl_retrieval_method == 'self-signed' else true }}"
+
+matrix_client_schildichat_registration_enabled: "{{ matrix_synapse_enable_registration }}"
+
+matrix_client_schildichat_enable_presence_by_hs_url: |
+  {{
+    none
+    if matrix_synapse_presence_enabled
+    else {matrix_client_schildichat_default_hs_url: false}
+  }}
+
+matrix_client_schildichat_welcome_user_id: ~
+
+matrix_client_schildichat_jitsi_preferred_domain: "{{ matrix_server_fqn_jitsi if jitsi_enabled else '' }}"
+
+######################################################################
+#
+# /matrix-client-schildichat
 #
 ######################################################################
 
@@ -4018,6 +4144,9 @@ matrix_sliding_sync_environment_variable_syncv3_secret: "{{ '%s' | format(matrix
 matrix_sliding_sync_database_hostname: "{{ devture_postgres_connection_hostname if devture_postgres_enabled else '' }}"
 matrix_sliding_sync_database_password: "{{ '%s' | format(matrix_homeserver_generic_secret_key) | password_hash('sha512', 'ss.db', rounds=655555) | to_uuid }}"
 
+# Starting from version `0.6.0` conduit natively supports some sync v3 (sliding-sync) features.
+matrix_homeserver_sliding_sync_url: "{{ matrix_sliding_sync_base_url if matrix_sliding_sync_enabled else matrix_homeserver_url if matrix_conduit_enabled else '' }}"
+
 ######################################################################
 #
 # /matrix-sliding-sync
@@ -4106,7 +4235,6 @@ matrix_conduit_systemd_required_services_list: |
   {{
     (['docker.service'])
   }}
-
 
 ######################################################################
 #
